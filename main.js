@@ -165,7 +165,7 @@ class ThreeApp {
     this.explodeTime = 80;
     this.fallTime = 250;
 
-    
+
     //リサイズイベント
     window.addEventListener('resize', () => {
       //レンダラの大きさを設定
@@ -191,7 +191,7 @@ class ThreeApp {
       transparent: true,
       opacity: 1
     });
-    
+
     let launchPosition = new THREE.Vector3(Math.random() * 200 - 100, 0, Math.random() * 200 - 100);
     let fireWork = new THREE.Group();
     fireWork.userData.tick = 0;
@@ -209,7 +209,7 @@ class ThreeApp {
       const radius = 20;
       const theta = Math.random() * 2 * Math.PI; // 0から2PIの間のランダムな角度(xy平面上)
       const phi = Math.acos(2 * Math.random() - 1); // 0からPIの間のランダムな角度(z軸)
-      
+
       box.userData.targetPosition = new THREE.Vector3(
         radius * Math.sin(phi) * Math.cos(theta),
         radius * Math.sin(phi) * Math.sin(theta),
@@ -228,6 +228,7 @@ class ThreeApp {
    */
 
   launchAnimation() {
+    const fireWorksToRemove = []; //アニメーションが終わった花火を削除する配列
     this.fireWorkArray.forEach((fireWork) => {
 
       fireWork.userData.tick++;
@@ -237,7 +238,7 @@ class ThreeApp {
           const distance = 50;
           let progress = Math.min(1, fireWork.userData.tick / fireWork.userData.launchTime);
           box.position.y = distance * this.easeOutQuart(progress);
-  
+
           if (progress >= 1) {
             box.userData.state = 'explode'; //状態を広がるに変更
             box.userData.startTick = fireWork.userData.tick; //広がりの開始時刻を記録
@@ -263,12 +264,22 @@ class ThreeApp {
                 box.material.opacity = 0;
               }
             }
+          } else {
+            fireWorksToRemove.push(fireWork);
           }
         }
       });
     });
+
+    //アニメーションが終了した花火をシーンから削除
+    if(fireWorksToRemove.length > 1) {
+      fireWorksToRemove.forEach((fireWork) => {
+        this.scene.remove(fireWork);
+        this.fireWorkArray = this.fireWorkArray.filter(fw => fw !== fireWork);
+      });
+    }
   }
-  
+
 
   /**
    * 描画処理
@@ -289,5 +300,5 @@ class ThreeApp {
 
   easeOutQuint(x) {
     return 1 - Math.pow(1 - x, 5);
-    }
+  }
 }
