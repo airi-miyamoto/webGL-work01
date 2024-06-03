@@ -13,7 +13,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   //ボタンのイベントリスナーを設定
   launchButton.addEventListener('click', () => {
-    app.createFireWork();
+    if (app.fireWorkArray.length < 20) {
+      app.createFireWork();
+    }
+    
   });
 
   //描画
